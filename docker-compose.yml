@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: ai_essay_grading_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-essay_grading}
+      POSTGRES_USER: ${POSTGRES_USER:-essay_grading_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-essay_grading_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - essay_grading_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-essay_grading_user} -d ${POSTGRES_DB:-essay_grading}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  essay_grading_postgres_data:
