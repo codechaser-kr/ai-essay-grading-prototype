@@ -87,7 +87,7 @@ Mock LLM Provider -> OpenAI Provider 확장 예정
 
 ## 로컬 실행 계획
 
-현재 단계에서는 초기 문서와 PostgreSQL Docker Compose만 준비되어 있습니다. 이후 단계에서 백엔드와 프론트엔드 프로젝트가 생성되면 다음 명령으로 실행합니다.
+현재 단계에서는 PostgreSQL Docker Compose와 Kotlin Spring Boot 백엔드 기본 프로젝트가 준비되어 있습니다. 프론트엔드 프로젝트는 이후 단계에서 생성합니다.
 
 ### PostgreSQL 실행
 
@@ -102,7 +102,19 @@ cd backend
 ./gradlew bootRun
 ```
 
+백엔드는 기본적으로 다음 PostgreSQL 연결 정보를 사용합니다.
+
+- URL: `jdbc:postgresql://localhost:5432/essay_grading`
+- Username: `essay_grading_user`
+- Password: `essay_grading_password`
+
+Swagger UI는 백엔드 실행 후 다음 주소에서 확인할 수 있습니다.
+
+- http://localhost:8080/swagger-ui.html
+
 ### Frontend 실행
+
+프론트엔드 프로젝트는 이후 단계에서 생성합니다.
 
 ```bash
 cd frontend
