@@ -1,6 +1,7 @@
 plugins {
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
+    id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
     kotlin("plugin.jpa") version "1.9.25"
@@ -39,6 +40,13 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
+}
+
+ktlint {
+    version.set("1.5.0")
+    android.set(false)
+    outputToConsole.set(true)
+    ignoreFailures.set(false)
 }
 
 tasks.withType<Test> {
