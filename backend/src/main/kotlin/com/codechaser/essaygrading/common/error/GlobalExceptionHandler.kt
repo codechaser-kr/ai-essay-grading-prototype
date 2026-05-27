@@ -52,6 +52,18 @@ class GlobalExceptionHandler {
             path = request.requestURI,
         )
 
+    @ExceptionHandler(Exception::class)
+    fun handleException(
+        exception: Exception,
+        request: HttpServletRequest,
+    ): ResponseEntity<ErrorResponse> =
+        errorResponse(
+            status = HttpStatus.INTERNAL_SERVER_ERROR,
+            message = "서버 내부 오류가 발생했습니다.",
+            developerMessage = exception.message,
+            path = request.requestURI,
+        )
+
     private fun errorResponse(
         status: HttpStatus,
         message: String,
