@@ -17,6 +17,9 @@ class GradingResultValidator {
         require(response.totalScore <= question.totalScore) {
             "채점 총점은 문제 총점을 초과할 수 없습니다. totalScore=${response.totalScore}, questionTotalScore=${question.totalScore}"
         }
+        require(response.maxScore == question.totalScore) {
+            "채점 최대 점수는 문제 총점과 일치해야 합니다. maxScore=${response.maxScore}, questionTotalScore=${question.totalScore}"
+        }
         require(response.rubricScores.sumOf { it.score } == response.totalScore) {
             "rubricScores 점수 합계는 채점 총점과 일치해야 합니다."
         }
@@ -36,6 +39,15 @@ class GradingResultValidator {
             }
             require(score.maxScore == rubricItem.maxScore) {
                 "rubric score의 maxScore는 등록된 rubric maxScore와 일치해야 합니다. rubricItemName=${score.rubricItemName}"
+            }
+        }
+
+        response.deductions.forEach { deduction ->
+            require(rubricItemsByName.containsKey(deduction.rubricItemName)) {
+                "등록되지 않은 rubric 항목의 감점 정보가 포함되어 있습니다. rubricItemName=${deduction.rubricItemName}"
+            }
+            require(deduction.pointsLost >= 0) {
+                "감점 점수는 0 이상이어야 합니다. rubricItemName=${deduction.rubricItemName}"
             }
         }
 

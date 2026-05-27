@@ -35,6 +35,56 @@ class GradingResultValidatorTest {
         }
     }
 
+    @Test
+    fun `채점 최대 점수가 문제 총점과 다르면 예외를 던진다`() {
+        val response =
+            validResponse().copy(
+                maxScore = 90,
+            )
+
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(question(), response)
+        }
+    }
+
+    @Test
+    fun `등록되지 않은 rubric 항목의 감점 정보가 있으면 예외를 던진다`() {
+        val response =
+            validResponse().copy(
+                deductions =
+                    listOf(
+                        GradingAiResponse.Deduction(
+                            rubricItemName = "미등록 항목",
+                            pointsLost = 3,
+                            reason = "등록되지 않은 항목입니다.",
+                        ),
+                    ),
+            )
+
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(question(), response)
+        }
+    }
+
+    @Test
+    fun `감점 점수가 음수이면 예외를 던진다`() {
+        val response =
+            validResponse().copy(
+                deductions =
+                    listOf(
+                        GradingAiResponse.Deduction(
+                            rubricItemName = "개념 이해",
+                            pointsLost = -1,
+                            reason = "음수 감점입니다.",
+                        ),
+                    ),
+            )
+
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(question(), response)
+        }
+    }
+
     private fun question(): QuestionEntity {
         val question =
             QuestionEntity(
