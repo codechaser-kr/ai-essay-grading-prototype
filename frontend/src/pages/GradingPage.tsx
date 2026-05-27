@@ -5,6 +5,9 @@ import { getQuestion } from "../api/questionApi";
 import LoadingButton from "../components/LoadingButton";
 import type { Question } from "../types/question";
 
+const sampleStudentAnswer =
+  "탄소 중립은 이산화탄소를 아예 배출하지 않는 것입니다. 실천 방법으로는 대중교통 이용과 전기 절약이 있습니다.";
+
 export default function GradingPage() {
   const { questionId } = useParams();
   const id = Number(questionId);
@@ -74,7 +77,7 @@ export default function GradingPage() {
       </section>
 
       <section className="section">
-        <h2>Rubric 요약</h2>
+        <h2>채점 기준 요약</h2>
         <div className="rubric-summary">
           {question.rubricItems.map((item) => (
             <div key={item.id}>
@@ -90,9 +93,14 @@ export default function GradingPage() {
           <label>학생 답안</label>
           <textarea value={studentAnswer} onChange={(event) => setStudentAnswer(event.target.value)} rows={10} required />
         </div>
-        <LoadingButton className="button" type="submit" loading={submitting} loadingText="채점 중">
-          채점 요청
-        </LoadingButton>
+        <div className="form-actions">
+          <button type="button" className="secondary" onClick={() => setStudentAnswer(sampleStudentAnswer)}>
+            샘플 답안 입력
+          </button>
+          <LoadingButton className="button" type="submit" loading={submitting} loadingText="채점 중">
+            채점 요청
+          </LoadingButton>
+        </div>
       </section>
     </form>
   );

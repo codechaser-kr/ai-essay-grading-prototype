@@ -133,6 +133,19 @@ button.danger {
   margin: 0;
 }
 
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .section,
 .empty,
 .score-band {
@@ -299,6 +312,14 @@ th {
   grid-template-columns: 120px 120px auto;
 }
 
+.inline-fields .field {
+  margin-bottom: 0;
+}
+
+.inline-fields button {
+  min-height: 46px;
+}
+
 .rubric-summary,
 .score-band {
   display: grid;
@@ -360,6 +381,18 @@ th {
   .list-row {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .header-actions {
+    justify-content: stretch;
+  }
+
+  .header-actions button {
+    flex: 1;
+  }
+
+  .form-actions button {
+    flex: 1;
   }
 
   .main {

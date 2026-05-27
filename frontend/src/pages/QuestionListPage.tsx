@@ -20,7 +20,7 @@ export default function QuestionListPage() {
       <div className="page-header">
         <div>
           <h1>문제 목록</h1>
-          <p>등록된 서술형 문제와 rubric 구성을 확인합니다.</p>
+          <p>등록된 서술형 문제와 채점 기준표 구성을 확인합니다.</p>
         </div>
         <Link className="button" to="/questions/new">
           문제 등록
@@ -48,7 +48,7 @@ export default function QuestionListPage() {
             </div>
             <div className="row-meta">
               <span>{question.totalScore}점</span>
-              <span>rubric {question.rubricItemCount}개</span>
+              <span>평가 항목 {question.rubricItemCount}개</span>
             </div>
           </Link>
         ))}

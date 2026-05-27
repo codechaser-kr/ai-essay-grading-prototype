@@ -29,13 +29,14 @@ export default function RubricItemEditor({ items, onChange }: RubricItemEditorPr
   return (
     <section className="section">
       <div className="section-header">
-        <h2>Rubric</h2>
+        <h2>채점 기준표</h2>
         <button type="button" className="secondary" onClick={addItem}>
           항목 추가
         </button>
       </div>
 
       <div className="rubric-editor">
+        {items.length === 0 && <p className="notice">등록된 평가 항목이 없습니다. 항목을 추가해주세요.</p>}
         {items.map((item, index) => (
           <div className="rubric-editor-row" key={index}>
             <div className="field">

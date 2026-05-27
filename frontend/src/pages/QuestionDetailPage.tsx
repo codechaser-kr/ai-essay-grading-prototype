@@ -54,7 +54,7 @@ export default function QuestionDetailPage() {
       </section>
 
       <section className="section">
-        <h2>Rubric</h2>
+        <h2>채점 기준표</h2>
         <div className="table-wrap">
           <table>
             <thead>

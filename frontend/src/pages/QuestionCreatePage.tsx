@@ -11,22 +11,31 @@ const initialForm: CreateQuestionRequest = {
   content: "",
   modelAnswer: "",
   totalScore: 100,
+  rubricItems: [],
+};
+
+const sampleForm: CreateQuestionRequest = {
+  title: "탄소 중립의 의미 설명",
+  subject: "science",
+  content: "탄소 중립이 무엇인지 설명하고, 실천 방법을 두 가지 이상 서술하시오.",
+  modelAnswer: "탄소 중립은 배출한 이산화탄소의 양만큼 흡수하거나 감축하여 실질 배출량을 0으로 만드는 것이다.",
+  totalScore: 100,
   rubricItems: [
     {
       name: "개념 이해",
-      criteria: "",
+      criteria: "탄소 중립의 의미를 정확히 설명한다.",
       maxScore: 40,
       sortOrder: 1,
     },
     {
-      name: "근거와 구체성",
-      criteria: "",
+      name: "실천 방안",
+      criteria: "실천 방법을 두 가지 이상 구체적으로 제시한다.",
       maxScore: 40,
       sortOrder: 2,
     },
     {
       name: "표현 명확성",
-      criteria: "",
+      criteria: "문장이 명확하고 논리적으로 구성되어 있다.",
       maxScore: 20,
       sortOrder: 3,
     },
@@ -43,14 +52,20 @@ export default function QuestionCreatePage() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSaving(true);
     setErrorMessage(null);
+
+    if (form.rubricItems.length === 0) {
+      setErrorMessage("채점 기준 항목을 1개 이상 추가해주세요.");
+      return;
+    }
+
+    setSaving(true);
 
     try {
       const question = await createQuestion(form);
       navigate(`/questions/${question.id}`);
     } catch {
-      setErrorMessage("문제를 저장하지 못했습니다. 입력값과 rubric 총점을 확인해주세요.");
+      setErrorMessage("문제를 저장하지 못했습니다. 입력값과 채점 기준표 배점 합계를 확인해주세요.");
     } finally {
       setSaving(false);
     }
@@ -63,9 +78,21 @@ export default function QuestionCreatePage() {
           <h1>문제 등록</h1>
           <p>문제, 모범 답안, 항목별 평가 기준을 입력합니다.</p>
         </div>
-        <LoadingButton className="button" type="submit" loading={saving} loadingText="저장 중">
-          저장
-        </LoadingButton>
+        <div className="header-actions">
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => {
+              setForm(sampleForm);
+              setErrorMessage(null);
+            }}
+          >
+            샘플 입력
+          </button>
+          <LoadingButton className="button" type="submit" loading={saving} loadingText="저장 중">
+            저장
+          </LoadingButton>
+        </div>
       </div>
 
       {errorMessage && <p className="error">{errorMessage}</p>}
@@ -92,7 +119,7 @@ export default function QuestionCreatePage() {
         <div className="field compact">
           <label>총점</label>
           <input type="number" min={1} value={form.totalScore} onChange={(event) => setForm({ ...form, totalScore: Number(event.target.value) })} />
-          <span className={rubricTotalScore === form.totalScore ? "hint" : "warning"}>rubric 합계 {rubricTotalScore}점</span>
+          <span className={rubricTotalScore === form.totalScore ? "hint" : "warning"}>평가 항목 배점 합계 {rubricTotalScore}점</span>
         </div>
       </section>
 
