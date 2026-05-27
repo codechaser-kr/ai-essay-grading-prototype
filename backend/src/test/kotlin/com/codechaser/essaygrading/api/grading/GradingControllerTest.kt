@@ -4,6 +4,7 @@ import com.codechaser.essaygrading.repository.GradingRequestRepository
 import com.codechaser.essaygrading.repository.GradingResultRepository
 import com.codechaser.essaygrading.repository.QuestionRepository
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -116,6 +117,27 @@ class GradingControllerTest {
                     ),
             ).andExpect(status().isNotFound)
             .andExpect(jsonPath("$.message").value("문제를 찾을 수 없습니다."))
+    }
+
+    @Test
+    fun `학생 답안이 최대 길이를 초과하면 400을 반환한다`() {
+        val questionId = createQuestion()
+        val longAnswer = "가".repeat(10001)
+
+        mockMvc
+            .perform(
+                post("/api/grading-requests")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                        {
+                          "questionId": $questionId,
+                          "studentAnswer": "$longAnswer"
+                        }
+                        """.trimIndent(),
+                    ),
+            ).andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.developerMessage", containsString("답안은 최대 10,000자까지 입력 가능합니다.")))
     }
 
     private fun createQuestion(): Long {
