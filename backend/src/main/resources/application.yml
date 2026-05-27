@@ -1,25 +1,8 @@
-server:
-  port: ${BACKEND_PORT:8080}
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
 
-spring:
-  application:
-    name: ai-essay-grading-backend
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/essay_grading}
-    username: ${POSTGRES_USER:essay_grading_user}
-    password: ${POSTGRES_PASSWORD:essay_grading_password}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    open-in-view: false
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
+llm:
+  provider: ${LLM_PROVIDER:mock}
 
 management:
   endpoints:
@@ -27,5 +10,25 @@ management:
       exposure:
         include: health,info
 
-llm:
-  provider: ${LLM_PROVIDER:mock}
+server:
+  port: ${BACKEND_PORT:8080}
+
+spring:
+  application:
+    name: ai-essay-grading-backend
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    password: ${POSTGRES_PASSWORD:essay_grading_password}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/essay_grading}
+    username: ${POSTGRES_USER:essay_grading_user}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
