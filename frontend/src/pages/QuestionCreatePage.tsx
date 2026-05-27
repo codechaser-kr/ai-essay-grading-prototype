@@ -59,6 +59,11 @@ export default function QuestionCreatePage() {
       return;
     }
 
+    if (rubricTotalScore !== form.totalScore) {
+      setErrorMessage(`채점 기준표 배점 합계(${rubricTotalScore}점)가 문제 총점(${form.totalScore}점)과 일치해야 합니다.`);
+      return;
+    }
+
     setSaving(true);
 
     try {
