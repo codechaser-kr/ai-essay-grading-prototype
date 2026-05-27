@@ -13,7 +13,7 @@ class QuestionService(
 ) {
     @Transactional
     fun createQuestion(request: Request.CreateQuestionParams): Response.QuestionData {
-        validateRubricTotalScore(request)
+        validateRubricItems(request)
 
         val question =
             QuestionEntity(
@@ -72,11 +72,17 @@ class QuestionService(
             .findQuestionDataById(questionId)
             ?: throw NotFoundException("문제를 찾을 수 없습니다.", "Question not found: id=$questionId")
 
-    private fun validateRubricTotalScore(request: Request.CreateQuestionParams) {
+    private fun validateRubricItems(request: Request.CreateQuestionParams) {
         val rubricTotalScore = request.rubricItems.sumOf { it.maxScore }
 
         require(rubricTotalScore == request.totalScore) {
             "rubric maxScore 합계는 문제 총점과 일치해야 합니다. totalScore=${request.totalScore}, rubricTotalScore=$rubricTotalScore"
+        }
+
+        val rubricItemNames = request.rubricItems.map { it.name.trim() }
+
+        require(rubricItemNames.size == rubricItemNames.distinct().size) {
+            "평가 기준 항목 이름은 중복될 수 없습니다."
         }
     }
 }

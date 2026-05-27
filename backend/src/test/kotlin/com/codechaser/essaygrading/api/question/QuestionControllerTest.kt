@@ -114,6 +114,23 @@ class QuestionControllerTest {
     }
 
     @Test
+    fun `rubric 이름이 중복되면 400을 반환한다`() {
+        val request =
+            sampleQuestionRequest().replace(
+                "\"name\": \"실천 방안\"",
+                "\"name\": \" 개념 이해 \"",
+            )
+
+        mockMvc
+            .perform(
+                post("/api/questions")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(request),
+            ).andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.developerMessage", containsString("평가 기준 항목 이름은 중복될 수 없습니다.")))
+    }
+
+    @Test
     fun `존재하지 않는 문제를 조회하면 404를 반환한다`() {
         mockMvc
             .perform(get("/api/questions/999"))
