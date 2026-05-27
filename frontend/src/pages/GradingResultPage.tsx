@@ -12,7 +12,11 @@ export default function GradingResultPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!Number.isFinite(id)) return;
+    if (!Number.isFinite(id)) {
+      setErrorMessage("올바르지 않은 채점 결과 ID입니다.");
+      setLoading(false);
+      return;
+    }
 
     getGradingResult(id)
       .then(setResult)

@@ -14,7 +14,11 @@ export default function QuestionDetailPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!Number.isFinite(id)) return;
+    if (!Number.isFinite(id)) {
+      setErrorMessage("올바르지 않은 문제 ID입니다.");
+      setLoading(false);
+      return;
+    }
 
     Promise.all([getQuestion(id), getGradingResults(id)])
       .then(([questionData, resultData]) => {
