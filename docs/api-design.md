@@ -1,4 +1,4 @@
-# API 설계 초안
+# API 설계
 
 ## 기본 원칙
 
@@ -6,6 +6,7 @@
 - Entity를 직접 응답하지 않고 DTO를 사용합니다.
 - 요청 검증은 Bean Validation으로 처리합니다.
 - 에러 응답은 사용자용 메시지와 개발자용 메시지를 분리합니다.
+- Swagger UI는 `http://localhost:8080/swagger-ui.html`에서 확인합니다.
 
 ## API 목록
 
@@ -18,7 +19,13 @@
 | 채점 결과 상세 조회 | GET | `/api/grading-results/{gradingResultId}` |
 | 문제별 채점 이력 조회 | GET | `/api/grading-results?questionId={questionId}` |
 
-## 문제 생성 Request 예시
+## 문제 생성
+
+```http
+POST /api/questions
+```
+
+Request:
 
 ```json
 {
@@ -50,7 +57,74 @@
 }
 ```
 
-## 채점 요청 Request 예시
+Response:
+
+```json
+{
+  "id": 1,
+  "title": "탄소 중립의 의미 설명",
+  "subject": "science",
+  "content": "탄소 중립이 무엇인지 설명하고, 실천 방법을 두 가지 이상 서술하시오.",
+  "modelAnswer": "탄소 중립은 배출한 이산화탄소의 양만큼 흡수하거나 감축하여 실질 배출량을 0으로 만드는 것이다.",
+  "totalScore": 100,
+  "rubricItems": [
+    {
+      "id": 1,
+      "name": "개념 이해",
+      "criteria": "탄소 중립의 의미를 정확히 설명한다.",
+      "maxScore": 40,
+      "sortOrder": 1
+    }
+  ],
+  "createdAt": "2026-05-27T13:00:00",
+  "updatedAt": "2026-05-27T13:00:00"
+}
+```
+
+검증:
+
+- `title`, `subject`, `content`, `modelAnswer`는 필수입니다.
+- `totalScore`는 1 이상입니다.
+- `rubricItems`는 1개 이상입니다.
+- rubric `maxScore` 합계는 `totalScore`와 일치해야 합니다.
+
+## 문제 목록 조회
+
+```http
+GET /api/questions
+```
+
+Response:
+
+```json
+[
+  {
+    "id": 1,
+    "title": "탄소 중립의 의미 설명",
+    "subject": "science",
+    "totalScore": 100,
+    "rubricItemCount": 3,
+    "createdAt": "2026-05-27T13:00:00",
+    "updatedAt": "2026-05-27T13:00:00"
+  }
+]
+```
+
+## 문제 상세 조회
+
+```http
+GET /api/questions/{questionId}
+```
+
+Response는 문제 생성 응답과 같은 `QuestionData` 구조입니다.
+
+## 채점 요청
+
+```http
+POST /api/grading-requests
+```
+
+Request:
 
 ```json
 {
@@ -59,19 +133,99 @@
 }
 ```
 
-## 채점 요청 Response 예시
+Response:
 
 ```json
 {
   "gradingRequestId": 1,
   "gradingResultId": 1,
   "status": "COMPLETED",
-  "totalScore": 72,
+  "totalScore": 78,
   "reviewRequired": true
 }
 ```
 
-## 에러 응답 형식 초안
+MVP에서는 Mock Provider가 동기적으로 채점 결과를 생성하므로 정상 요청은 즉시 `COMPLETED` 상태를 반환합니다.
+
+## 채점 결과 상세 조회
+
+```http
+GET /api/grading-results/{gradingResultId}
+```
+
+Response:
+
+```json
+{
+  "id": 1,
+  "gradingRequestId": 1,
+  "questionId": 1,
+  "studentAnswer": "탄소 중립은 이산화탄소를 아예 배출하지 않는 것입니다.",
+  "modelName": "mock-grading-model",
+  "promptVersionName": "mock-v1",
+  "totalScore": 78,
+  "maxScore": 100,
+  "confidence": "MEDIUM",
+  "reviewRequired": true,
+  "rubricScores": [
+    {
+      "rubricItemName": "개념 이해",
+      "score": 32,
+      "maxScore": 40,
+      "reason": "개념 이해 기준을 일부 충족했지만 보완할 부분이 있습니다."
+    }
+  ],
+  "deductions": [
+    {
+      "rubricItemName": "개념 이해",
+      "pointsLost": 8,
+      "reason": "개념 이해 항목에서 설명의 정확성 또는 구체성이 부족합니다."
+    }
+  ],
+  "studentFeedback": "답변의 방향은 적절하지만 핵심 개념을 더 정확하고 구체적으로 설명할 필요가 있습니다.",
+  "learningPoints": [
+    "문제의 핵심 개념을 모범 답안과 비교해 복습하세요.",
+    "평가 기준별로 빠진 내용을 한 문장씩 보완하는 연습을 하세요."
+  ],
+  "reviewReasons": [
+    "핵심 개념 설명에 오개념 또는 누락 가능성이 있습니다."
+  ],
+  "createdAt": "2026-05-27T13:00:00"
+}
+```
+
+## 문제별 채점 이력 조회
+
+```http
+GET /api/grading-results?questionId=1
+```
+
+Response:
+
+```json
+[
+  {
+    "id": 1,
+    "gradingRequestId": 1,
+    "questionId": 1,
+    "studentAnswer": "탄소 중립은 이산화탄소를 아예 배출하지 않는 것입니다.",
+    "modelName": "mock-grading-model",
+    "promptVersionName": "mock-v1",
+    "totalScore": 78,
+    "maxScore": 100,
+    "confidence": "MEDIUM",
+    "reviewRequired": true,
+    "rubricScores": [],
+    "deductions": [],
+    "studentFeedback": "답변의 방향은 적절하지만 핵심 개념을 더 정확하고 구체적으로 설명할 필요가 있습니다.",
+    "learningPoints": [],
+    "reviewReasons": [],
+    "createdAt": "2026-05-27T13:00:00"
+  }
+]
+```
+
+## 에러 응답
 
 ```json
 {
@@ -79,14 +233,14 @@
   "developerMessage": "studentAnswer must not be blank",
   "status": 400,
   "path": "/api/grading-requests",
-  "timestamp": "2026-05-26T10:00:00"
+  "timestamp": "2026-05-27T13:00:00"
 }
 ```
 
-## 상태 코드
+상태 코드:
 
 - `200 OK`: 조회 성공
 - `201 Created`: 생성 성공
-- `400 Bad Request`: 요청 검증 실패
+- `400 Bad Request`: 요청 검증 실패 또는 비즈니스 검증 실패
 - `404 Not Found`: 리소스 없음
 - `500 Internal Server Error`: 서버 내부 오류

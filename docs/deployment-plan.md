@@ -1,8 +1,8 @@
-# 배포 계획 초안
+# 배포 계획
 
 ## Local Docker Compose
 
-MVP 초기에는 PostgreSQL만 Docker Compose로 실행합니다. 백엔드와 프론트엔드는 개발 편의를 위해 로컬 프로세스로 실행합니다.
+MVP 현재 단계에서는 PostgreSQL만 Docker Compose로 실행합니다. 백엔드와 프론트엔드는 개발 편의를 위해 로컬 프로세스로 실행합니다.
 
 ```bash
 docker compose up -d postgres
@@ -13,6 +13,7 @@ docker compose up -d postgres
 - PostgreSQL: Docker Compose
 - Backend: `./gradlew bootRun`
 - Frontend: `npm run dev`
+- Swagger: `http://localhost:8080/swagger-ui.html`
 
 ## Oracle Cloud Ubuntu VM 배포 계획
 
