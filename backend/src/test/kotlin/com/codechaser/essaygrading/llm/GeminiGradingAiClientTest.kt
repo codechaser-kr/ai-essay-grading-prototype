@@ -2,6 +2,7 @@ package com.codechaser.essaygrading.llm
 
 import com.codechaser.essaygrading.enums.GradingConfidence
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -11,6 +12,7 @@ import org.springframework.test.web.client.ExpectedCount.once
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.content
 import org.springframework.test.web.client.match.MockRestRequestMatchers.header
+import org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath
 import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
@@ -40,6 +42,18 @@ class GeminiGradingAiClientTest {
         requestExpectation.andExpect(method(HttpMethod.POST))
         requestExpectation.andExpect(header("x-goog-api-key", "test-gemini-key"))
         requestExpectation.andExpect(content().json("""{"generationConfig":{"responseMimeType":"application/json"}}"""))
+        requestExpectation.andExpect(
+            jsonPath("$.contents[0].parts[0].text")
+                .value(containsString("한국어 서술형 답안")),
+        )
+        requestExpectation.andExpect(
+            jsonPath("$.contents[0].parts[0].text")
+                .value(containsString("오개념")),
+        )
+        requestExpectation.andExpect(
+            jsonPath("$.contents[0].parts[0].text")
+                .value(containsString("관련 rubricScores에서 반드시 감점")),
+        )
         requestExpectation.andRespond(withSuccess(geminiResponse(), MediaType.APPLICATION_JSON))
 
         val response = client.grade(sampleRequest())
