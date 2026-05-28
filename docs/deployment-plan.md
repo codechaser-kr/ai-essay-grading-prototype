@@ -1,8 +1,8 @@
-# 배포 계획
+# 배포 참고
 
 ## Local Docker Compose
 
-MVP 현재 단계에서는 PostgreSQL만 Docker Compose로 실행합니다. 백엔드와 프론트엔드는 개발 편의를 위해 로컬 프로세스로 실행합니다.
+로컬 개발에서는 PostgreSQL만 Docker Compose로 실행합니다. 백엔드와 프론트엔드는 개발 편의를 위해 로컬 프로세스로 띄웁니다.
 
 ```bash
 docker compose up -d postgres
@@ -11,13 +11,13 @@ docker compose up -d postgres
 ## 로컬 실행 구성
 
 - PostgreSQL: Docker Compose
-- Backend: `./gradlew bootRun`
+- Backend: `LLM_PROVIDER=gemini GEMINI_API_KEY=... GEMINI_MODEL=gemini-2.5-flash GEMINI_TIMEOUT_SECONDS=60 ./gradlew bootRun`
 - Frontend: `npm run dev`
 - Swagger: `http://localhost:8080/swagger-ui.html`
 
-## Oracle Cloud Ubuntu VM 배포 계획
+## 운영 배포 참고 구성
 
-MVP 이후 Oracle Cloud Ubuntu VM에 다음 구성으로 배포합니다.
+운영 배포가 필요하면 다음 구성을 기준으로 단순하게 구성할 수 있습니다.
 
 - PostgreSQL 컨테이너
 - Spring Boot 애플리케이션 컨테이너
@@ -25,22 +25,12 @@ MVP 이후 Oracle Cloud Ubuntu VM에 다음 구성으로 배포합니다.
 - Caddy 또는 Nginx reverse proxy
 - systemd 또는 Docker Compose 기반 프로세스 관리
 
-## 도메인 연결 계획
+## 도메인 연결 참고
 
-초기 배포에서는 DuckDNS 또는 Cloudflare를 사용해 도메인을 연결합니다.
+도메인이 필요할 때는 DuckDNS 또는 Cloudflare를 사용할 수 있습니다.
 
 - DuckDNS: 빠른 개인 프로젝트 배포에 적합
 - Cloudflare: DNS 관리, TLS, 보안 설정 확장에 적합
-
-## 향후 AWS 확장 계획
-
-서비스 확장이나 운영 안정성이 필요해지면 AWS 기반 구성을 검토합니다.
-
-- RDS for PostgreSQL
-- ECS 또는 Elastic Beanstalk
-- S3 + CloudFront
-- Route 53
-- CloudWatch Logs
 
 ## 배포 전 점검 항목
 
@@ -48,4 +38,4 @@ MVP 이후 Oracle Cloud Ubuntu VM에 다음 구성으로 배포합니다.
 - `.env` 파일은 Git에 커밋하지 않음
 - CORS 허용 origin을 운영 도메인으로 제한
 - Swagger UI 공개 범위 검토
-- OpenAI API 사용량 제한과 timeout 설정
+- Gemini API 사용량 제한과 timeout 값 점검
