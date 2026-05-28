@@ -54,9 +54,10 @@ GradingAiClient
         |
         +-- MockGradingAiClient
         +-- OpenAiGradingAiClient
+        +-- GeminiGradingAiClient
 ```
 
-백엔드는 `GradingAiClient` 인터페이스 뒤에 채점 Provider를 둡니다. 현재 MVP는 `LLM_PROVIDER=mock`으로 Mock Provider를 사용하며, 이후 `LLM_PROVIDER=openai`로 실제 OpenAI Provider를 연결할 수 있게 설계했습니다.
+백엔드는 `GradingAiClient` 인터페이스 뒤에 채점 Provider를 둡니다. 현재 MVP는 `LLM_PROVIDER=mock`으로 Mock Provider를 사용합니다. `LLM_PROVIDER=gemini`와 `GEMINI_API_KEY`를 설정하면 Gemini API로 실제 채점을 요청할 수 있습니다. 기본 모델은 `GEMINI_MODEL=gemini-2.5-flash`입니다.
 
 ## 로컬 실행 방법
 
@@ -70,7 +71,7 @@ docker compose up -d postgres
 
 ```bash
 cd backend
-./gradlew bootRun
+LLM_PROVIDER=gemini GEMINI_API_KEY="your-gemini-api-key" GEMINI_MODEL=gemini-2.5-flash ./gradlew bootRun
 ```
 
 기본 DB 연결 정보:

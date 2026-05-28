@@ -80,6 +80,8 @@ GradingAiClient
       +-- MockGradingAiClient
       |
       +-- OpenAiGradingAiClient
+      |
+      +-- GeminiGradingAiClient
 ```
 
 현재 설정:
@@ -90,6 +92,7 @@ llm:
 ```
 
 `LLM_PROVIDER`가 없으면 `mock`이 기본값입니다. `OpenAiGradingAiClient`는 구조만 준비되어 있으며 MVP에서는 실제 API를 호출하지 않습니다.
+`LLM_PROVIDER=gemini`과 `GEMINI_API_KEY`를 설정하면 `GeminiGradingAiClient`가 Gemini `generateContent` API를 호출합니다.
 
 ## 채점 처리 흐름
 
