@@ -1,6 +1,7 @@
 package com.codechaser.essaygrading.llm
 
 import com.codechaser.essaygrading.enums.GradingConfidence
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -243,6 +244,7 @@ class GeminiGradingAiClient(
         val responseSchema: Map<String, Any>,
     )
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private data class GeminiGradingPayload(
         val totalScore: Int,
         val maxScore: Int,
@@ -255,6 +257,7 @@ class GeminiGradingAiClient(
         val reviewReasons: List<String>,
     )
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private data class GeminiRubricScorePayload(
         val rubricItemName: String,
         val score: Int,
@@ -262,6 +265,7 @@ class GeminiGradingAiClient(
         val reason: String,
     )
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private data class GeminiDeductionPayload(
         val rubricItemName: String,
         val pointsLost: Int,
