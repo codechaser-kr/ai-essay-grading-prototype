@@ -124,14 +124,22 @@ class GeminiGradingAiClient(
         rubricScores: List<GradingAiResponse.RubricScore>,
         payload: GeminiGradingPayload,
     ): List<GradingAiResponse.Deduction> {
-        val deductionsByRubricName = payload.deductions.associateBy { it.rubricItemName }
+        val deductionReasonsByRubricName =
+            payload.deductions
+                .groupBy { it.rubricItemName }
+                .mapValues { (_, deductions) ->
+                    deductions
+                        .map { it.reason.trim() }
+                        .filter { it.isNotBlank() }
+                        .distinct()
+                        .joinToString(" / ")
+                }
 
         return rubricScores
             .filter { it.score < it.maxScore }
             .map {
                 val deductionReason =
-                    deductionsByRubricName[it.rubricItemName]
-                        ?.reason
+                    deductionReasonsByRubricName[it.rubricItemName]
                         ?.takeIf { reason -> reason.isNotBlank() }
                         ?: it.reason
 
