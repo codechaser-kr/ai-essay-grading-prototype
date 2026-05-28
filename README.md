@@ -145,6 +145,47 @@ npm run build
 4. 채점 결과 화면에서 총점, 항목별 점수, 감점 사유, 피드백, 재검토 여부를 확인합니다.
 5. 문제 상세 화면에서 채점 이력을 다시 확인합니다.
 
+Swagger에서 바로 확인하려면 먼저 `POST /api/questions`에 다음 요청을 보냅니다.
+
+```json
+{
+  "title": "탄소 중립의 의미 설명",
+  "subject": "science",
+  "content": "탄소 중립이 무엇인지 설명하고, 실천 방법을 두 가지 이상 서술하시오.",
+  "modelAnswer": "탄소 중립은 배출한 이산화탄소의 양만큼 흡수하거나 감축하여 실질 배출량을 0으로 만드는 것이다.",
+  "totalScore": 100,
+  "rubricItems": [
+    {
+      "name": "개념 이해",
+      "criteria": "탄소 중립의 의미를 정확히 설명한다.",
+      "maxScore": 40,
+      "sortOrder": 1
+    },
+    {
+      "name": "실천 방안",
+      "criteria": "실천 방법을 두 가지 이상 구체적으로 제시한다.",
+      "maxScore": 40,
+      "sortOrder": 2
+    },
+    {
+      "name": "표현 명확성",
+      "criteria": "문장이 명확하고 논리적으로 구성되어 있다.",
+      "maxScore": 20,
+      "sortOrder": 3
+    }
+  ]
+}
+```
+
+응답의 `id`를 `questionId`로 사용해 `POST /api/grading-requests`에 채점 요청을 보냅니다.
+
+```json
+{
+  "questionId": 1,
+  "studentAnswer": "탄소 중립은 이산화탄소를 아예 배출하지 않는 것입니다. 실천 방법으로는 대중교통 이용과 전기 절약이 있습니다."
+}
+```
+
 ## LLM Provider 전략
 
 현재 제공하는 Provider는 다음과 같습니다.
