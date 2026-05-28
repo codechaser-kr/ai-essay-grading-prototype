@@ -145,7 +145,7 @@ Response:
 }
 ```
 
-MVP에서는 Mock Provider가 동기적으로 채점 결과를 생성하므로 정상 요청은 즉시 `COMPLETED` 상태를 반환합니다.
+현재 채점 처리는 동기 방식입니다. 선택된 LLM Provider가 정상 응답을 반환하고 백엔드 검증을 통과하면 즉시 `COMPLETED` 상태를 반환합니다.
 
 ## 채점 결과 상세 조회
 
@@ -161,8 +161,8 @@ Response:
   "gradingRequestId": 1,
   "questionId": 1,
   "studentAnswer": "탄소 중립은 이산화탄소를 아예 배출하지 않는 것입니다.",
-  "modelName": "mock-grading-model",
-  "promptVersionName": "mock-v1",
+  "modelName": "gemini-2.5-flash",
+  "promptVersionName": "gemini-grading-v1",
   "totalScore": 78,
   "maxScore": 100,
   "confidence": "MEDIUM",
@@ -173,6 +173,18 @@ Response:
       "score": 32,
       "maxScore": 40,
       "reason": "개념 이해 기준을 일부 충족했지만 보완할 부분이 있습니다."
+    },
+    {
+      "rubricItemName": "실천 방안",
+      "score": 30,
+      "maxScore": 40,
+      "reason": "실천 방법은 제시했지만 구체적인 설명이 부족합니다."
+    },
+    {
+      "rubricItemName": "표현 명확성",
+      "score": 16,
+      "maxScore": 20,
+      "reason": "문장은 이해 가능하지만 일부 표현이 단정적입니다."
     }
   ],
   "deductions": [
@@ -180,9 +192,19 @@ Response:
       "rubricItemName": "개념 이해",
       "pointsLost": 8,
       "reason": "개념 이해 항목에서 설명의 정확성 또는 구체성이 부족합니다."
+    },
+    {
+      "rubricItemName": "실천 방안",
+      "pointsLost": 10,
+      "reason": "실천 방법의 효과와 연결 설명이 부족합니다."
+    },
+    {
+      "rubricItemName": "표현 명확성",
+      "pointsLost": 4,
+      "reason": "일부 문장이 모범 답안의 개념과 다르게 해석될 수 있습니다."
     }
   ],
-  "studentFeedback": "답변의 방향은 적절하지만 핵심 개념을 더 정확하고 구체적으로 설명할 필요가 있습니다.",
+  "studentFeedback": "답변의 방향은 적절하지만 탄소 중립의 핵심 개념을 더 정확하게 설명할 필요가 있습니다.",
   "learningPoints": [
     "문제의 핵심 개념을 모범 답안과 비교해 복습하세요.",
     "평가 기준별로 빠진 내용을 한 문장씩 보완하는 연습을 하세요."
@@ -209,17 +231,57 @@ Response:
     "gradingRequestId": 1,
     "questionId": 1,
     "studentAnswer": "탄소 중립은 이산화탄소를 아예 배출하지 않는 것입니다.",
-    "modelName": "mock-grading-model",
-    "promptVersionName": "mock-v1",
+    "modelName": "gemini-2.5-flash",
+    "promptVersionName": "gemini-grading-v1",
     "totalScore": 78,
     "maxScore": 100,
     "confidence": "MEDIUM",
     "reviewRequired": true,
-    "rubricScores": [],
-    "deductions": [],
-    "studentFeedback": "답변의 방향은 적절하지만 핵심 개념을 더 정확하고 구체적으로 설명할 필요가 있습니다.",
-    "learningPoints": [],
-    "reviewReasons": [],
+    "rubricScores": [
+      {
+        "rubricItemName": "개념 이해",
+        "score": 32,
+        "maxScore": 40,
+        "reason": "개념 이해 기준을 일부 충족했지만 보완할 부분이 있습니다."
+      },
+      {
+        "rubricItemName": "실천 방안",
+        "score": 30,
+        "maxScore": 40,
+        "reason": "실천 방법은 제시했지만 구체적인 설명이 부족합니다."
+      },
+      {
+        "rubricItemName": "표현 명확성",
+        "score": 16,
+        "maxScore": 20,
+        "reason": "문장은 이해 가능하지만 일부 표현이 단정적입니다."
+      }
+    ],
+    "deductions": [
+      {
+        "rubricItemName": "개념 이해",
+        "pointsLost": 8,
+        "reason": "개념 이해 항목에서 설명의 정확성 또는 구체성이 부족합니다."
+      },
+      {
+        "rubricItemName": "실천 방안",
+        "pointsLost": 10,
+        "reason": "실천 방법의 효과와 연결 설명이 부족합니다."
+      },
+      {
+        "rubricItemName": "표현 명확성",
+        "pointsLost": 4,
+        "reason": "일부 문장이 모범 답안의 개념과 다르게 해석될 수 있습니다."
+      }
+    ],
+    "studentFeedback": "답변의 방향은 적절하지만 탄소 중립의 핵심 개념을 더 정확하게 설명할 필요가 있습니다.",
+    "learningPoints": [
+      "문제의 핵심 개념을 모범 답안과 비교해 복습하세요.",
+      "평가 기준별로 빠진 내용을 한 문장씩 보완하는 연습을 하세요."
+    ],
+    "reviewReasons": [
+      "핵심 개념 설명에 오개념 또는 누락 가능성이 있습니다."
+    ],
     "createdAt": "2026-05-27T13:00:00"
   }
 ]

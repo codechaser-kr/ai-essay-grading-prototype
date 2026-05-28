@@ -2,13 +2,14 @@
 
 AI Essay Grading Prototype은 LLM API를 활용하여 서술형 답안을 채점하고, 결과를 구조화된 JSON으로 저장·검증·시각화하는 AI 에듀테크 포트폴리오 프로젝트입니다.
 
-이 프로젝트는 단순한 OpenAI API 호출 데모가 아니라, 문제 등록, 평가 기준 rubric 관리, 학생 답안 제출, AI 채점, 항목별 점수, 감점 사유, 피드백, 재검토 플래그, 채점 이력, 프롬프트 버전 관리를 포함한 실제 서비스형 구조를 목표로 합니다.
+이 프로젝트는 단순한 LLM API 호출 데모가 아니라, 문제 등록, 평가 기준 rubric 관리, 학생 답안 제출, AI 채점, 항목별 점수, 감점 사유, 피드백, 재검토 플래그, 채점 이력을 포함한 실제 서비스형 구조를 목표로 합니다.
 
 ## 프로젝트 목적
 
 - 문제와 평가 기준을 등록하고 학생 답안을 채점하는 전체 흐름을 구현합니다.
-- Mock LLM Provider로 외부 API 없이 MVP를 검증합니다.
-- OpenAI Provider를 추가할 수 있도록 LLM 호출 인터페이스를 분리합니다.
+- Gemini API Provider로 실제 LLM 채점 요청/응답을 검증합니다.
+- Mock LLM Provider로 외부 API 없이 로컬 흐름을 검증할 수 있습니다.
+- LLM 호출 인터페이스를 분리해 Gemini와 Mock Provider를 설정으로 선택할 수 있게 합니다.
 - 채점 결과 JSON, 모델명, 프롬프트 버전명을 함께 저장해 추적 가능성을 확보합니다.
 - 백엔드, 프론트엔드, 데이터베이스, 로컬 인프라가 연결된 풀스택 포트폴리오를 구성합니다.
 
@@ -17,7 +18,8 @@ AI Essay Grading Prototype은 LLM API를 활용하여 서술형 답안을 채점
 - 문제와 rubric 생성
 - 문제 목록 및 상세 조회
 - 학생 답안 채점 요청
-- Mock LLM 기반 구조화된 채점 결과 생성
+- Gemini API 기반 구조화된 채점 결과 생성
+- Mock Provider 기반 오프라인 채점 결과 생성
 - 채점 결과 검증 후 DB 저장
 - 총점, 항목별 점수, 감점 사유, 피드백, 보완 학습 포인트 표시
 - 재검토 필요 여부와 재검토 사유 표시
@@ -32,7 +34,7 @@ AI Essay Grading Prototype은 LLM API를 활용하여 서술형 답안을 채점
 | API Docs | Springdoc OpenAPI, Swagger UI |
 | Database | PostgreSQL 16 |
 | Local Infra | Docker Compose |
-| LLM | Mock Provider, OpenAI Provider 확장 구조 |
+| LLM | Gemini API Provider, Mock Provider |
 
 ## 아키텍처
 
@@ -53,15 +55,18 @@ GradingService
 GradingAiClient
         |
         +-- MockGradingAiClient
-        +-- OpenAiGradingAiClient
         +-- GeminiGradingAiClient
 ```
 
-백엔드는 `GradingAiClient` 인터페이스 뒤에 채점 Provider를 둡니다. 현재 MVP는 `LLM_PROVIDER=mock`으로 Mock Provider를 사용합니다. `LLM_PROVIDER=gemini`와 `GEMINI_API_KEY`를 설정하면 Gemini API로 실제 채점을 요청할 수 있습니다. 기본 모델은 `GEMINI_MODEL=gemini-2.5-flash`입니다.
+백엔드는 `GradingAiClient` 인터페이스 뒤에 채점 Provider를 둡니다. `LLM_PROVIDER=gemini`와 `GEMINI_API_KEY`를 설정하면 Gemini API로 실제 채점을 요청합니다. `LLM_PROVIDER`가 없으면 `mock`이 기본값입니다.
+
+Gemini Provider는 `generateContent` API에 JSON 응답 schema를 전달하고, 응답을 `GradingAiResponse`로 변환합니다. 이후 백엔드는 `GradingResultValidator`로 총점, rubric 항목명, 배점, 감점 항목을 검증한 뒤 저장합니다.
 
 ## 로컬 실행 방법
 
 ### PostgreSQL 실행
+
+로컬 DB는 Docker Compose로 실행하는 PostgreSQL 16을 사용합니다.
 
 ```bash
 docker compose up -d postgres
@@ -72,6 +77,13 @@ docker compose up -d postgres
 ```bash
 cd backend
 LLM_PROVIDER=gemini GEMINI_API_KEY="your-gemini-api-key" GEMINI_MODEL=gemini-2.5-flash ./gradlew bootRun
+```
+
+외부 API 없이 Mock Provider로 실행하려면 다음 명령을 사용합니다.
+
+```bash
+cd backend
+LLM_PROVIDER=mock ./gradlew bootRun
 ```
 
 기본 DB 연결 정보:
@@ -95,6 +107,17 @@ npm run dev
 - Swagger: http://localhost:8080/swagger-ui.html
 - OpenAPI JSON: http://localhost:8080/v3/api-docs
 - PostgreSQL: localhost:5432
+
+### 검증 명령
+
+```bash
+cd backend
+./gradlew test
+./gradlew ktlintCheck
+
+cd ../frontend
+npm run build
+```
 
 ## API 문서
 
@@ -122,20 +145,14 @@ npm run dev
 4. 채점 결과 화면에서 총점, 항목별 점수, 감점 사유, 피드백, 재검토 여부를 확인합니다.
 5. 문제 상세 화면에서 채점 이력을 다시 확인합니다.
 
-시연용 JSON은 [docs/sample-data.md](docs/sample-data.md)에 정리되어 있습니다.
-
 ## LLM Provider 전략
 
-MVP는 실제 OpenAI API를 호출하지 않습니다. `MockGradingAiClient`가 rubric 기준의 구조화된 결과를 반환하고, 백엔드는 `GradingResultValidator`로 점수 합계와 검증 규칙을 확인한 뒤 저장합니다.
+현재 구현된 Provider는 다음과 같습니다.
 
-향후 `OpenAiGradingAiClient`는 다음 역할을 맡습니다.
+- `GeminiGradingAiClient`: Gemini `generateContent` API를 호출해 구조화된 채점 JSON을 생성합니다.
+- `MockGradingAiClient`: 외부 API 없이 고정 규칙 기반 채점 결과를 생성합니다.
 
-- 활성 프롬프트 버전 조회
-- system prompt와 user prompt 생성
-- OpenAI Responses API 호출
-- Structured Outputs JSON Schema 적용
-- 응답 JSON 파싱
-- 백엔드 검증 후 저장
+Gemini 응답은 모델 출력 그대로 저장하지 않고, 등록된 rubric 기준으로 점수와 감점 항목을 보정한 뒤 백엔드 검증을 통과해야 저장됩니다. 실패한 채점 요청은 `grading_requests`에 `FAILED` 상태와 오류 메시지를 남깁니다.
 
 ## DB 설계 요약
 
@@ -144,36 +161,26 @@ MVP는 실제 OpenAI API를 호출하지 않습니다. `MockGradingAiClient`가 
 - `grading_requests`: 학생 답안과 채점 처리 상태
 - `grading_results`: 채점 결과 JSON, 모델명, 프롬프트 버전명, 총점, 재검토 여부
 
-프롬프트 버전과 재채점 이력 테이블은 MVP 이후 확장 대상으로 문서에 설계해 두었습니다.
-
 ## 문서
 
 - [아키텍처](docs/architecture.md)
 - [API 설계](docs/api-design.md)
 - [DB 설계](docs/db-design.md)
 - [프롬프트 설계](docs/prompt-design.md)
-- [개발 계획](docs/development-plan.md)
-- [배포 계획](docs/deployment-plan.md)
-- [샘플 데이터](docs/sample-data.md)
+- [개발 기록](docs/development-plan.md)
+- [배포 참고](docs/deployment-plan.md)
 
-## 향후 확장 계획
+## 마무리 개선 범위
 
-- OpenAI Provider 실제 구현
-- Structured Outputs JSON Schema 적용
-- 프롬프트 버전 관리 API와 화면 추가
-- 재채점 기능 추가
-- 채점 이력 비교 화면 추가
-- 관리자 검토 상태 추가
-- Docker Compose 전체 배포 구성
-- Oracle Cloud Ubuntu VM 배포
-- Caddy 또는 Nginx reverse proxy 추가
-- Cloudflare 또는 DuckDNS 도메인 연결
+- 오개념이 포함된 답안의 감점 기준 보강
+- `reviewRequired`와 rubric 점수의 정합성 개선
+- Gemini 응답 품질을 높이기 위한 프롬프트 문구 조정
 
 ## 강조 역량
 
 - Kotlin/Spring Boot 기반 REST API 설계와 검증
 - JPA Entity와 API DTO 분리
-- LLM Provider 추상화와 Mock 기반 MVP 설계
+- LLM Provider 추상화와 Gemini API 연동
 - 구조화 JSON 저장과 검증 로직 구현
 - React/TypeScript 기반 API 연동 화면 구현
 - Docker Compose 기반 로컬 개발 환경 구성
