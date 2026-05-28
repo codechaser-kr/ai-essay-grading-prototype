@@ -92,6 +92,7 @@ gemini:
   api-key: ${GEMINI_API_KEY:}
   base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
   model: ${GEMINI_MODEL:gemini-2.5-flash}
+  timeout-seconds: ${GEMINI_TIMEOUT_SECONDS:60}
 ```
 
 `LLM_PROVIDER`가 없으면 `mock`이 기본값입니다. `LLM_PROVIDER=gemini`과 `GEMINI_API_KEY`를 설정하면 `GeminiGradingAiClient`가 Gemini `generateContent` API를 호출합니다.
@@ -138,7 +139,7 @@ GradingResult 저장
 
 ```text
 PostgreSQL: docker compose up -d postgres
-Backend:    cd backend && LLM_PROVIDER=gemini GEMINI_API_KEY=... GEMINI_MODEL=gemini-2.5-flash ./gradlew bootRun
+Backend:    cd backend && LLM_PROVIDER=gemini GEMINI_API_KEY=... GEMINI_MODEL=gemini-2.5-flash GEMINI_TIMEOUT_SECONDS=60 ./gradlew bootRun
 Frontend:   cd frontend && npm run dev
 ```
 

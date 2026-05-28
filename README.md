@@ -76,7 +76,7 @@ docker compose up -d postgres
 
 ```bash
 cd backend
-LLM_PROVIDER=gemini GEMINI_API_KEY="your-gemini-api-key" GEMINI_MODEL=gemini-2.5-flash ./gradlew bootRun
+LLM_PROVIDER=gemini GEMINI_API_KEY="your-gemini-api-key" GEMINI_MODEL=gemini-2.5-flash GEMINI_TIMEOUT_SECONDS=60 ./gradlew bootRun
 ```
 
 외부 API 없이 Mock Provider로 실행할 때는 다음 명령을 사용합니다.

@@ -29,10 +29,9 @@ class GeminiGradingAiClientTest {
         val client =
             GeminiGradingAiClient(
                 objectMapper = objectMapper,
-                restClientBuilder = restClientBuilder,
+                restClient = restClientBuilder.baseUrl("https://generativelanguage.googleapis.com/v1beta").build(),
                 apiKey = "test-gemini-key",
                 model = "gemini-2.5-flash",
-                baseUrl = "https://generativelanguage.googleapis.com/v1beta",
             )
 
         val requestExpectation =
@@ -77,10 +76,9 @@ class GeminiGradingAiClientTest {
         val client =
             GeminiGradingAiClient(
                 objectMapper = objectMapper,
-                restClientBuilder = RestClient.builder(),
+                restClient = RestClient.builder().build(),
                 apiKey = "",
                 model = "gemini-2.5-flash",
-                baseUrl = "https://generativelanguage.googleapis.com/v1beta",
             )
 
         val exception =
@@ -98,10 +96,9 @@ class GeminiGradingAiClientTest {
         val client =
             GeminiGradingAiClient(
                 objectMapper = objectMapper,
-                restClientBuilder = restClientBuilder,
+                restClient = restClientBuilder.baseUrl("https://generativelanguage.googleapis.com/v1beta").build(),
                 apiKey = "test-gemini-key",
                 model = "gemini-2.5-flash",
-                baseUrl = "https://generativelanguage.googleapis.com/v1beta",
             )
 
         val requestExpectation =

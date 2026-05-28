@@ -11,7 +11,7 @@ docker compose up -d postgres
 ## 로컬 실행 구성
 
 - PostgreSQL: Docker Compose
-- Backend: `LLM_PROVIDER=gemini GEMINI_API_KEY=... GEMINI_MODEL=gemini-2.5-flash ./gradlew bootRun`
+- Backend: `LLM_PROVIDER=gemini GEMINI_API_KEY=... GEMINI_MODEL=gemini-2.5-flash GEMINI_TIMEOUT_SECONDS=60 ./gradlew bootRun`
 - Frontend: `npm run dev`
 - Swagger: `http://localhost:8080/swagger-ui.html`
 
@@ -38,4 +38,4 @@ docker compose up -d postgres
 - `.env` 파일은 Git에 커밋하지 않음
 - CORS 허용 origin을 운영 도메인으로 제한
 - Swagger UI 공개 범위 검토
-- Gemini API 사용량 제한과 timeout 설정
+- Gemini API 사용량 제한과 timeout 값 점검

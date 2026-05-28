@@ -2,23 +2,39 @@ package com.codechaser.essaygrading.llm
 
 import com.codechaser.essaygrading.enums.GradingConfidence
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.web.client.ClientHttpRequestFactories
+import org.springframework.boot.web.client.ClientHttpRequestFactorySettings
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClientResponseException
+import java.time.Duration
 
 @Component
 @ConditionalOnProperty(name = ["llm.provider"], havingValue = "gemini")
 class GeminiGradingAiClient(
     private val objectMapper: ObjectMapper,
-    restClientBuilder: RestClient.Builder,
-    @Value("\${gemini.api-key:}") private val apiKey: String,
-    @Value("\${gemini.model:gemini-2.5-flash}") private val model: String,
-    @Value("\${gemini.base-url:https://generativelanguage.googleapis.com/v1beta}") baseUrl: String,
+    private val restClient: RestClient,
+    private val apiKey: String,
+    private val model: String,
 ) : GradingAiClient {
-    private val restClient: RestClient = restClientBuilder.baseUrl(baseUrl).build()
+    @Autowired
+    constructor(
+        objectMapper: ObjectMapper,
+        restClientBuilder: RestClient.Builder,
+        @Value("\${gemini.api-key:}") apiKey: String,
+        @Value("\${gemini.model:gemini-2.5-flash}") model: String,
+        @Value("\${gemini.base-url:https://generativelanguage.googleapis.com/v1beta}") baseUrl: String,
+        @Value("\${gemini.timeout-seconds:60}") timeoutSeconds: Long,
+    ) : this(
+        objectMapper = objectMapper,
+        restClient = buildRestClient(restClientBuilder, baseUrl, timeoutSeconds),
+        apiKey = apiKey,
+        model = model,
+    )
 
     override fun grade(request: GradingAiRequest): GradingAiResponse {
         check(apiKey.isNotBlank()) {
@@ -247,6 +263,21 @@ class GeminiGradingAiClient(
     companion object {
         private const val PROMPT_VERSION_NAME = "gemini-grading-v1"
 
+        private fun buildRestClient(
+            restClientBuilder: RestClient.Builder,
+            baseUrl: String,
+            timeoutSeconds: Long,
+        ): RestClient =
+            restClientBuilder
+                .baseUrl(baseUrl)
+                .requestFactory(
+                    ClientHttpRequestFactories.get(
+                        ClientHttpRequestFactorySettings.DEFAULTS
+                            .withConnectTimeout(Duration.ofSeconds(timeoutSeconds))
+                            .withReadTimeout(Duration.ofSeconds(timeoutSeconds)),
+                    ),
+                ).build()
+
         private val stringSchema = mapOf("type" to "string")
         private val integerSchema = mapOf("type" to "integer")
         private val booleanSchema = mapOf("type" to "boolean")
@@ -255,7 +286,6 @@ class GeminiGradingAiClient(
                 "type" to "array",
                 "items" to stringSchema,
             )
-
         private val gradingResponseSchema: Map<String, Any> =
             mapOf(
                 "type" to "object",
