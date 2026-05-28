@@ -23,7 +23,7 @@ class GeminiGradingAiClientTest {
     private val objectMapper = jacksonObjectMapper()
 
     @Test
-    fun `Gemini generateContent 응답을 채점 응답으로 변환한다`() {
+    fun `Gemini 응답 점수가 요청 rubric과 달라도 요청 기준으로 보정한다`() {
         val restClientBuilder = RestClient.builder()
         val server = MockRestServiceServer.bindTo(restClientBuilder).build()
         val client =
