@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
+import axios from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { createGradingRequest } from "../api/gradingApi";
 import { getQuestion } from "../api/questionApi";
@@ -48,7 +49,16 @@ export default function GradingPage() {
       }
 
       navigate(`/grading-results/${response.gradingResultId}`);
-    } catch {
+    } catch (error) {
+      if (axios.isAxiosError<{ developerMessage?: string; message?: string }>(error)) {
+        console.error("Grading request failed", {
+          status: error.response?.status,
+          developerMessage: error.response?.data?.developerMessage,
+          message: error.response?.data?.message,
+        });
+      } else {
+        console.error("Grading request failed", error);
+      }
       setErrorMessage("채점 요청에 실패했습니다. 답안 내용을 확인해주세요.");
     } finally {
       setSubmitting(false);
