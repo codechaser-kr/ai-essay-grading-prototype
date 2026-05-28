@@ -2,13 +2,13 @@
 
 ## 목표
 
-프롬프트는 서술형 답안을 rubric 기준으로 일관되게 채점하고, 백엔드가 검증 가능한 JSON 구조로 결과를 반환하도록 설계합니다.
+프롬프트는 서술형 답안을 rubric 기준으로 일관되게 채점하고, 백엔드가 검증할 수 있는 JSON 구조로 결과를 반환하도록 설계합니다.
 
-현재 실제 LLM 호출은 `GeminiGradingAiClient`가 담당합니다. `MockGradingAiClient`는 외부 API 없이 같은 응답 구조를 검증하는 로컬 Provider입니다.
+실제 LLM 호출은 `GeminiGradingAiClient`가 담당합니다. `MockGradingAiClient`는 외부 API 없이 같은 응답 구조를 확인하는 로컬 Provider입니다.
 
 ## 현재 구조
 
-현재 채점 결과는 다음 흐름으로 생성됩니다.
+채점 결과는 다음 흐름으로 생성됩니다.
 
 ```text
 GradingService
@@ -19,7 +19,7 @@ GradingService
   -> grading_results.result_json 저장
 ```
 
-저장되는 메타데이터:
+저장 메타데이터:
 
 - `modelName`: `gemini-2.5-flash` 또는 `mock-grading-model`
 - `promptVersionName`: `gemini-grading-v1` 또는 `mock-v1`
@@ -127,7 +127,7 @@ GradingService
 
 ## JSON 응답 Schema
 
-Gemini Provider는 `generationConfig.responseMimeType=application/json`과 `responseSchema`를 사용해 다음 구조의 JSON 응답을 요청합니다. 백엔드 저장 전에는 이 schema와 별도로 자체 검증을 다시 수행합니다.
+Gemini Provider는 `generationConfig.responseMimeType=application/json`과 `responseSchema`를 사용해 다음 구조의 JSON 응답을 요청합니다. 저장 전에는 이 schema와 별도로 백엔드 검증을 다시 수행합니다.
 
 ```json
 {
@@ -217,7 +217,7 @@ Gemini Provider는 `generationConfig.responseMimeType=application/json`과 `resp
 
 ## 백엔드 검증 전략
 
-LLM 응답 schema를 사용하더라도 백엔드는 최종 저장 전에 자체 검증을 수행합니다. Gemini 응답은 저장 전 등록된 rubric 기준으로 점수와 감점 항목을 보정합니다.
+LLM 응답 schema를 사용하더라도 최종 저장 전에는 백엔드가 자체 검증을 수행합니다. Gemini 응답은 저장 전에 등록된 rubric 기준으로 점수와 감점 항목을 보정합니다.
 
 1. `totalScore >= 0`
 2. `totalScore <= question.totalScore`

@@ -2,8 +2,8 @@
 
 ## 작업 원칙
 
-- 실제 LLM API 연동은 Gemini Provider로 검증합니다.
-- Mock LLM Provider는 외부 API 없이 전체 서비스 흐름을 검증할 때 사용합니다.
+- 실제 LLM API 연동은 Gemini Provider로 처리합니다.
+- Mock LLM Provider는 외부 API 없이 전체 서비스 흐름을 확인할 때 사용합니다.
 - API Key와 민감 정보는 Git에 커밋하지 않습니다.
 - `.env`는 제외하고 `.env.example`만 커밋합니다.
 - 백엔드 API contract를 먼저 안정화한 뒤 프론트엔드를 연결합니다.
@@ -13,7 +13,7 @@
 
 ### 1단계: 초기 구조와 문서 완료
 
-- `backend/`, `frontend/`, `docs/`, `infra/` 생성
+- `backend/`, `frontend/`, `docs/` 구성
 - README 초안 작성
 - 아키텍처, API, DB, 프롬프트, 개발, 배포 문서 초안 작성
 - `.gitignore`, `.env.example`, `docker-compose.yml` 작성
@@ -55,7 +55,7 @@
 - API Key, 모델명 환경변수 추가
 - Gemini Provider 단위 테스트 추가
 
-### 7단계: 문서 정리 진행 중
+### 7단계: 문서 정리
 
 - README 실행 방법 보강
 - API 예시 업데이트
@@ -70,7 +70,7 @@
 
 ## 테스트 전략
 
-현재 적용된 검증은 다음과 같습니다.
+현재 적용한 검증은 다음과 같습니다.
 
 - Backend: Controller 통합 테스트
 - Validation: 요청 DTO 검증 실패 테스트

@@ -2,9 +2,9 @@
 
 ## 개요
 
-AI Essay Grading Prototype은 문제 등록, rubric 관리, 학생 답안 제출, LLM 기반 채점, 결과 저장, 프론트엔드 시각화를 하나의 풀스택 흐름으로 구성합니다.
+AI Essay Grading Prototype은 문제 등록, rubric 관리, 학생 답안 제출, LLM 기반 채점, 결과 저장, 프론트엔드 시각화를 하나의 풀스택 흐름으로 연결합니다.
 
-백엔드는 `GradingAiClient` 인터페이스를 기준으로 Provider를 분리합니다. 현재 실제 API 연동은 `GeminiGradingAiClient`가 담당하고, 외부 API 없이 흐름을 검증할 때는 `MockGradingAiClient`를 사용합니다.
+백엔드는 `GradingAiClient` 인터페이스를 기준으로 Provider를 분리합니다. 실제 API 연동은 `GeminiGradingAiClient`가 담당하고, 외부 API 없이 흐름을 확인할 때는 `MockGradingAiClient`를 사용합니다.
 
 ## 전체 구조
 
@@ -25,7 +25,7 @@ PostgreSQL 16
 
 ## Frontend
 
-프론트엔드는 다음 화면을 제공합니다.
+프론트엔드는 다음 화면으로 구성됩니다.
 
 - 문제 목록: `/`
 - 문제 등록: `/questions/new`
@@ -43,9 +43,9 @@ API base URL은 `VITE_API_BASE_URL` 환경변수를 사용합니다.
 
 ## Backend
 
-백엔드는 REST API, 요청 검증, 채점 요청 생성, LLM Provider 호출, 결과 검증, PostgreSQL 저장을 담당합니다.
+백엔드는 REST API, 요청 검증, 채점 요청 생성, LLM Provider 호출, 결과 검증, PostgreSQL 저장을 맡습니다.
 
-현재 주요 패키지 구조:
+주요 패키지 구조:
 
 ```text
 com.codechaser.essaygrading
@@ -127,7 +127,7 @@ GradingResult 저장
 
 ## Database
 
-현재 구현에서 실제 사용하는 테이블:
+현재 사용하는 테이블:
 
 - `questions`
 - `rubric_items`

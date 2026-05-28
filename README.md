@@ -1,17 +1,17 @@
 # AI Essay Grading Prototype
 
-AI Essay Grading Prototype은 LLM API를 활용하여 서술형 답안을 채점하고, 결과를 구조화된 JSON으로 저장·검증·시각화하는 AI 에듀테크 포트폴리오 프로젝트입니다.
+AI Essay Grading Prototype은 LLM API로 서술형 답안을 채점하고, 결과를 구조화된 JSON으로 저장·검증·시각화하는 AI 에듀테크 포트폴리오 프로젝트입니다.
 
-이 프로젝트는 단순한 LLM API 호출 데모가 아니라, 문제 등록, 평가 기준 rubric 관리, 학생 답안 제출, AI 채점, 항목별 점수, 감점 사유, 피드백, 재검토 플래그, 채점 이력을 포함한 실제 서비스형 구조를 목표로 합니다.
+단순한 LLM API 호출 예제가 아니라 문제 등록, rubric 관리, 학생 답안 제출, AI 채점, 항목별 점수, 감점 사유, 피드백, 재검토 플래그, 채점 이력까지 이어지는 서비스형 흐름을 다룹니다.
 
 ## 프로젝트 목적
 
-- 문제와 평가 기준을 등록하고 학생 답안을 채점하는 전체 흐름을 구현합니다.
-- Gemini API Provider로 실제 LLM 채점 요청/응답을 검증합니다.
-- Mock LLM Provider로 외부 API 없이 로컬 흐름을 검증할 수 있습니다.
-- LLM 호출 인터페이스를 분리해 Gemini와 Mock Provider를 설정으로 선택할 수 있게 합니다.
+- 문제와 평가 기준을 등록하고 학생 답안을 채점하는 흐름을 end-to-end로 구현합니다.
+- Gemini API Provider로 실제 LLM 채점 요청과 응답을 처리합니다.
+- Mock LLM Provider로 외부 API 없이도 로컬 흐름을 확인할 수 있습니다.
+- LLM 호출 인터페이스를 분리해 Gemini와 Mock Provider를 설정으로 선택합니다.
 - 채점 결과 JSON, 모델명, 프롬프트 버전명을 함께 저장해 추적 가능성을 확보합니다.
-- 백엔드, 프론트엔드, 데이터베이스, 로컬 인프라가 연결된 풀스택 포트폴리오를 구성합니다.
+- 백엔드, 프론트엔드, 데이터베이스, 로컬 인프라를 연결한 풀스택 예제로 구성합니다.
 
 ## 주요 기능
 
@@ -58,15 +58,15 @@ GradingAiClient
         +-- GeminiGradingAiClient
 ```
 
-백엔드는 `GradingAiClient` 인터페이스 뒤에 채점 Provider를 둡니다. `LLM_PROVIDER=gemini`와 `GEMINI_API_KEY`를 설정하면 Gemini API로 실제 채점을 요청합니다. `LLM_PROVIDER`가 없으면 `mock`이 기본값입니다.
+백엔드는 `GradingAiClient` 인터페이스 뒤에 채점 Provider를 둡니다. `LLM_PROVIDER=gemini`와 `GEMINI_API_KEY`를 설정하면 Gemini API로 실제 채점을 요청하고, `LLM_PROVIDER`가 없으면 `mock`을 기본값으로 사용합니다.
 
-Gemini Provider는 `generateContent` API에 JSON 응답 schema를 전달하고, 응답을 `GradingAiResponse`로 변환합니다. 이후 백엔드는 `GradingResultValidator`로 총점, rubric 항목명, 배점, 감점 항목을 검증한 뒤 저장합니다.
+Gemini Provider는 `generateContent` API에 JSON 응답 schema를 전달하고, 응답을 `GradingAiResponse`로 변환합니다. 백엔드는 변환된 결과를 `GradingResultValidator`로 검증한 뒤 저장합니다.
 
 ## 로컬 실행 방법
 
 ### PostgreSQL 실행
 
-로컬 DB는 Docker Compose로 실행하는 PostgreSQL 16을 사용합니다.
+로컬 DB는 Docker Compose로 실행한 PostgreSQL 16을 사용합니다.
 
 ```bash
 docker compose up -d postgres
@@ -79,7 +79,7 @@ cd backend
 LLM_PROVIDER=gemini GEMINI_API_KEY="your-gemini-api-key" GEMINI_MODEL=gemini-2.5-flash ./gradlew bootRun
 ```
 
-외부 API 없이 Mock Provider로 실행하려면 다음 명령을 사용합니다.
+외부 API 없이 Mock Provider로 실행할 때는 다음 명령을 사용합니다.
 
 ```bash
 cd backend
@@ -147,12 +147,12 @@ npm run build
 
 ## LLM Provider 전략
 
-현재 구현된 Provider는 다음과 같습니다.
+현재 제공하는 Provider는 다음과 같습니다.
 
-- `GeminiGradingAiClient`: Gemini `generateContent` API를 호출해 구조화된 채점 JSON을 생성합니다.
-- `MockGradingAiClient`: 외부 API 없이 고정 규칙 기반 채점 결과를 생성합니다.
+- `GeminiGradingAiClient`: Gemini `generateContent` API를 호출해 구조화된 채점 JSON을 받습니다.
+- `MockGradingAiClient`: 외부 API 없이 고정 규칙 기반 채점 결과를 반환합니다.
 
-Gemini 응답은 모델 출력 그대로 저장하지 않고, 등록된 rubric 기준으로 점수와 감점 항목을 보정한 뒤 백엔드 검증을 통과해야 저장됩니다. 실패한 채점 요청은 `grading_requests`에 `FAILED` 상태와 오류 메시지를 남깁니다.
+Gemini 응답은 모델 출력 그대로 저장하지 않습니다. 등록된 rubric 기준으로 점수와 감점 항목을 보정하고, 백엔드 검증을 통과한 결과만 저장합니다. 실패한 채점 요청은 `grading_requests`에 `FAILED` 상태와 오류 메시지를 남깁니다.
 
 ## DB 설계 요약
 

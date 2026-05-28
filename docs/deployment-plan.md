@@ -2,7 +2,7 @@
 
 ## Local Docker Compose
 
-현재 로컬 개발 단계에서는 PostgreSQL만 Docker Compose로 실행합니다. 백엔드와 프론트엔드는 개발 편의를 위해 로컬 프로세스로 실행합니다.
+로컬 개발에서는 PostgreSQL만 Docker Compose로 실행합니다. 백엔드와 프론트엔드는 개발 편의를 위해 로컬 프로세스로 띄웁니다.
 
 ```bash
 docker compose up -d postgres
@@ -17,7 +17,7 @@ docker compose up -d postgres
 
 ## 운영 배포 참고 구성
 
-운영 배포가 필요해질 경우 다음 구성을 기준으로 단순하게 배포할 수 있습니다.
+운영 배포가 필요하면 다음 구성을 기준으로 단순하게 구성할 수 있습니다.
 
 - PostgreSQL 컨테이너
 - Spring Boot 애플리케이션 컨테이너
@@ -27,7 +27,7 @@ docker compose up -d postgres
 
 ## 도메인 연결 참고
 
-도메인이 필요하면 DuckDNS 또는 Cloudflare를 사용할 수 있습니다.
+도메인이 필요할 때는 DuckDNS 또는 Cloudflare를 사용할 수 있습니다.
 
 - DuckDNS: 빠른 개인 프로젝트 배포에 적합
 - Cloudflare: DNS 관리, TLS, 보안 설정 확장에 적합

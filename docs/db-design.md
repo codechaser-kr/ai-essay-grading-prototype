@@ -2,9 +2,9 @@
 
 ## 개요
 
-데이터베이스는 PostgreSQL을 사용합니다. 로컬 개발 환경에서는 JPA `ddl-auto: update`로 테이블을 생성하고, 운영 배포 단계에서는 Flyway 또는 Liquibase 도입을 검토합니다.
+데이터베이스는 PostgreSQL을 사용합니다. 로컬 개발 환경에서는 JPA `ddl-auto: update`로 테이블을 생성합니다.
 
-현재 구현된 Entity 기준 테이블:
+현재 Entity 기준 테이블:
 
 - `questions`
 - `rubric_items`
@@ -66,7 +66,7 @@
 - `COMPLETED`: 채점 결과 저장 완료
 - `FAILED`: 채점 또는 검증 실패
 
-현재는 동기 처리라 정상 요청은 대부분 즉시 `COMPLETED`가 됩니다.
+현재는 동기 처리 방식이므로 정상 요청은 대부분 즉시 `COMPLETED`가 됩니다.
 
 ## grading_results
 

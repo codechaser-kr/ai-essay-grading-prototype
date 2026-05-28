@@ -2,8 +2,8 @@
 
 ## 기본 원칙
 
-- API prefix는 `/api`를 사용합니다.
-- Entity를 직접 응답하지 않고 DTO를 사용합니다.
+- API prefix는 `/api`입니다.
+- Entity는 직접 노출하지 않고 DTO로 응답합니다.
 - 요청 검증은 Bean Validation으로 처리합니다.
 - 에러 응답은 사용자용 메시지와 개발자용 메시지를 분리합니다.
 - Swagger UI는 `http://localhost:8080/swagger-ui.html`에서 확인합니다.
@@ -116,7 +116,7 @@ Response:
 GET /api/questions/{questionId}
 ```
 
-Response는 문제 생성 응답과 같은 `QuestionData` 구조입니다.
+Response는 문제 생성 응답과 같은 `QuestionData` 구조를 사용합니다.
 
 ## 채점 요청
 
@@ -145,7 +145,7 @@ Response:
 }
 ```
 
-현재 채점 처리는 동기 방식입니다. 선택된 LLM Provider가 정상 응답을 반환하고 백엔드 검증을 통과하면 즉시 `COMPLETED` 상태를 반환합니다.
+채점 처리는 동기 방식입니다. 선택된 LLM Provider가 정상 응답을 반환하고 백엔드 검증을 통과하면 즉시 `COMPLETED` 상태를 반환합니다.
 
 ## 채점 결과 상세 조회
 
