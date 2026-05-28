@@ -68,9 +68,14 @@ class GeminiGradingAiClient(
         val normalizedRubricScores = normalizeRubricScores(request, payload)
         val normalizedDeductions = buildDeductions(normalizedRubricScores, payload)
         val missingRubricNames =
-            request.rubricItems
-                .map { it.name }
-                .filterNot { rubricName -> payload.rubricScores.any { it.rubricItemName == rubricName } }
+            payload.rubricScores
+                .map { normalizeRubricName(it.rubricItemName) }
+                .toSet()
+                .let { responseRubricNames ->
+                    request.rubricItems
+                        .map { it.name }
+                        .filterNot { rubricName -> normalizeRubricName(rubricName) in responseRubricNames }
+                }
         val reviewReasons =
             (
                 payload.reviewReasons +
@@ -101,12 +106,12 @@ class GeminiGradingAiClient(
         request: GradingAiRequest,
         payload: GeminiGradingPayload,
     ): List<GradingAiResponse.RubricScore> {
-        val scoresByName = payload.rubricScores.associateBy { it.rubricItemName }
+        val scoresByName = payload.rubricScores.associateBy { normalizeRubricName(it.rubricItemName) }
 
         return request.rubricItems
             .sortedBy { it.sortOrder }
             .map { rubricItem ->
-                val score = scoresByName[rubricItem.name]
+                val score = scoresByName[normalizeRubricName(rubricItem.name)]
 
                 GradingAiResponse.RubricScore(
                     rubricItemName = rubricItem.name,
@@ -127,7 +132,7 @@ class GeminiGradingAiClient(
     ): List<GradingAiResponse.Deduction> {
         val deductionReasonsByRubricName =
             payload.deductions
-                .groupBy { it.rubricItemName }
+                .groupBy { normalizeRubricName(it.rubricItemName) }
                 .mapValues { (_, deductions) ->
                     deductions
                         .map { it.reason.trim() }
@@ -140,7 +145,7 @@ class GeminiGradingAiClient(
             .filter { it.score < it.maxScore }
             .map {
                 val deductionReason =
-                    deductionReasonsByRubricName[it.rubricItemName]
+                    deductionReasonsByRubricName[normalizeRubricName(it.rubricItemName)]
                         ?.takeIf { reason -> reason.isNotBlank() }
                         ?: it.reason
 
@@ -274,6 +279,8 @@ class GeminiGradingAiClient(
 
     companion object {
         private const val PROMPT_VERSION_NAME = "gemini-grading-v1"
+
+        private fun normalizeRubricName(name: String): String = name.trim()
 
         private fun buildRestClient(
             restClientBuilder: RestClient.Builder,

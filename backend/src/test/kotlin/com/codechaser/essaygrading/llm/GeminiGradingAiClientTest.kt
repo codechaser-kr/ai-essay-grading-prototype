@@ -4,6 +4,7 @@ import com.codechaser.essaygrading.enums.GradingConfidence
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -63,6 +64,7 @@ class GeminiGradingAiClientTest {
         assertEquals("gemini-2.5-flash", response.modelName)
         assertEquals("gemini-grading-v1", response.promptVersionName)
         assertEquals(GradingConfidence.MEDIUM, response.confidence)
+        assertFalse(response.reviewRequired)
         assertEquals(2, response.rubricScores.size)
         assertEquals("개념 이해", response.rubricScores.first().rubricItemName)
         assertEquals(listOf("개념 이해", "실천 방안"), response.deductions.map { it.rubricItemName })
@@ -160,7 +162,7 @@ class GeminiGradingAiClientTest {
               "content": {
                 "parts": [
                   {
-                    "text": "{\"totalScore\":20,\"maxScore\":20,\"rubricScores\":[{\"rubricItemName\":\"개념 이해\",\"score\":48,\"maxScore\":10,\"reason\":\"핵심 의미는 일부 설명했지만 상쇄 개념이 부족합니다.\",\"extraRubricNote\":\"ignored\"},{\"rubricItemName\":\"실천 방안\",\"score\":34,\"maxScore\":10,\"reason\":\"실천 예시는 제시했지만 구체성이 조금 부족합니다.\"}],\"deductions\":[{\"rubricItemName\":\"개념 이해\",\"pointsLost\":6,\"reason\":\"정의 설명이 부족합니다.\",\"extraDeductionNote\":\"ignored\"},{\"rubricItemName\":\"개념 이해\",\"pointsLost\":6,\"reason\":\"실질 배출량 0 설명이 빠졌습니다.\"},{\"rubricItemName\":\"전반적인 완성도\",\"pointsLost\":1,\"reason\":\"등록되지 않은 항목명입니다.\"}],\"studentFeedback\":\"핵심 방향은 맞지만 탄소 중립의 정의를 더 정확히 써야 합니다.\",\"learningPoints\":[\"실질 배출량 0의 의미를 복습하세요.\",\"실천 방안을 구체적 행동으로 설명하세요.\"],\"confidence\":\"MEDIUM\",\"reviewRequired\":false,\"reviewReasons\":[],\"extraModelNote\":\"ignored\"}"
+                    "text": "{\"totalScore\":20,\"maxScore\":20,\"rubricScores\":[{\"rubricItemName\":\" 개념 이해 \",\"score\":48,\"maxScore\":10,\"reason\":\"핵심 의미는 일부 설명했지만 상쇄 개념이 부족합니다.\",\"extraRubricNote\":\"ignored\"},{\"rubricItemName\":\" 실천 방안 \",\"score\":34,\"maxScore\":10,\"reason\":\"실천 예시는 제시했지만 구체성이 조금 부족합니다.\"}],\"deductions\":[{\"rubricItemName\":\" 개념 이해 \",\"pointsLost\":6,\"reason\":\"정의 설명이 부족합니다.\",\"extraDeductionNote\":\"ignored\"},{\"rubricItemName\":\"개념 이해\",\"pointsLost\":6,\"reason\":\"실질 배출량 0 설명이 빠졌습니다.\"},{\"rubricItemName\":\"전반적인 완성도\",\"pointsLost\":1,\"reason\":\"등록되지 않은 항목명입니다.\"}],\"studentFeedback\":\"핵심 방향은 맞지만 탄소 중립의 정의를 더 정확히 써야 합니다.\",\"learningPoints\":[\"실질 배출량 0의 의미를 복습하세요.\",\"실천 방안을 구체적 행동으로 설명하세요.\"],\"confidence\":\"MEDIUM\",\"reviewRequired\":false,\"reviewReasons\":[],\"extraModelNote\":\"ignored\"}"
                   }
                 ]
               }
