@@ -192,11 +192,13 @@ class GeminiGradingAiClient(
         val root = objectMapper.readTree(rawResponse)
         val generatedText = root.at("/candidates/0/content/parts/0/text").asText(null)
 
-        return if (generatedText.isNullOrBlank()) {
-            rawResponse
-        } else {
-            generatedText.trim()
-        }
+        return generatedText
+            ?.takeIf { it.isNotBlank() }
+            ?.trim()
+            ?: error(
+                "Gemini response has no text content. " +
+                    "path=/candidates/0/content/parts/0/text, rawResponse=${rawResponse.take(300)}...",
+            )
     }
 
     private data class GeminiGenerateContentRequest(

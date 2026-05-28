@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
@@ -88,6 +89,41 @@ class GeminiGradingAiClientTest {
             }
 
         assertEquals("GEMINI_API_KEY is required when LLM_PROVIDER=gemini.", exception.message)
+    }
+
+    @Test
+    fun `Gemini 응답에 text가 없으면 명확한 예외를 던진다`() {
+        val restClientBuilder = RestClient.builder()
+        val server = MockRestServiceServer.bindTo(restClientBuilder).build()
+        val client =
+            GeminiGradingAiClient(
+                objectMapper = objectMapper,
+                restClientBuilder = restClientBuilder,
+                apiKey = "test-gemini-key",
+                model = "gemini-2.5-flash",
+                baseUrl = "https://generativelanguage.googleapis.com/v1beta",
+            )
+
+        val requestExpectation =
+            server.expect(
+                once(),
+                requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"),
+            )
+        requestExpectation.andRespond(
+            withSuccess("""{"candidates":[{"content":{"parts":[]}}]}""", MediaType.APPLICATION_JSON),
+        )
+
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                client.grade(sampleRequest())
+            }
+
+        assertTrue(
+            exception.message
+                ?.contains("Gemini response has no text content. path=/candidates/0/content/parts/0/text") == true,
+        )
+
+        server.verify()
     }
 
     private fun sampleRequest(): GradingAiRequest =
