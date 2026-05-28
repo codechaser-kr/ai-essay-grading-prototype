@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getGradingResults } from "../api/gradingApi";
 import { getQuestion } from "../api/questionApi";
+import { formatGradingConfidence } from "../types/grading";
 import type { GradingResult } from "../types/grading";
 import type { Question } from "../types/question";
 
@@ -98,8 +99,8 @@ export default function QuestionDetailPage() {
                   <span>{result.modelName}</span>
                 </div>
                 <div className="row-meta">
-                  <span>{result.confidence}</span>
-                  <span>{result.reviewRequired ? "재검토 필요" : "재검토 불필요"}</span>
+                  <span>채점 확신도 {formatGradingConfidence(result.confidence)}</span>
+                  <span>{result.reviewRequired ? "AI 채점 재검토 필요" : "AI 채점 재검토 불필요"}</span>
                 </div>
               </Link>
             ))}

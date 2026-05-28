@@ -1,6 +1,16 @@
 export type GradingStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
 export type GradingConfidence = "HIGH" | "MEDIUM" | "LOW";
 
+export function formatGradingConfidence(confidence: GradingConfidence): string {
+  const labels: Record<GradingConfidence, string> = {
+    HIGH: "높음",
+    MEDIUM: "보통",
+    LOW: "낮음",
+  };
+
+  return labels[confidence];
+}
+
 export type CreateGradingRequest = {
   questionId: number;
   studentAnswer: string;
