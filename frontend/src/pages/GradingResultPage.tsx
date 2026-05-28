@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getGradingResult } from "../api/gradingApi";
 import RubricScoreTable from "../components/RubricScoreTable";
+import { formatGradingConfidence } from "../types/grading";
 import type { GradingResult } from "../types/grading";
 
 export default function GradingResultPage() {
@@ -50,11 +51,11 @@ export default function GradingResultPage() {
           </strong>
         </div>
         <div>
-          <span>Confidence</span>
-          <strong>{result.confidence}</strong>
+          <span>채점 확신도</span>
+          <strong>{formatGradingConfidence(result.confidence)}</strong>
         </div>
         <div>
-          <span>Review</span>
+          <span>AI 채점 재검토</span>
           <strong>{result.reviewRequired ? "필요" : "불필요"}</strong>
         </div>
       </section>
@@ -92,9 +93,9 @@ export default function GradingResultPage() {
           </ul>
         </div>
         <div>
-          <h2>재검토 사유</h2>
+          <h2>AI 채점 재검토 사유</h2>
           {result.reviewReasons.length === 0 ? (
-            <p className="notice">재검토 사유가 없습니다.</p>
+            <p className="notice">AI 채점 재검토 사유가 없습니다.</p>
           ) : (
             <ul className="compact-points">
               {result.reviewReasons.map((reason) => (
