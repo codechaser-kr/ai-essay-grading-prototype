@@ -22,7 +22,7 @@ GradingService
 저장 메타데이터:
 
 - `modelName`: `gemini-2.5-flash` 또는 `mock-grading-model`
-- `promptVersionName`: `gemini-grading-v1` 또는 `mock-v1`
+- `promptVersionName`: `gemini-grading-v2` 또는 `mock-v1`
 - `resultJson`: 구조화된 채점 결과 JSON
 - `rawResponse`: LLM 원본 응답 또는 Mock 원본 응답 문자열
 
@@ -41,9 +41,14 @@ GradingService
 - deductions에는 제공된 평가 항목명만 사용해야 합니다.
 - confidence는 HIGH, MEDIUM, LOW 중 하나여야 합니다.
 - confidence가 LOW이면 reviewRequired는 반드시 true여야 합니다.
+- 채점 전에 모범 답안의 핵심 조건과 학생 답안의 핵심 주장을 비교한 뒤 점수를 정하세요.
 - 학생 답안에 오개념, 핵심 개념 누락, 모범 답안과의 의미 차이가 있으면 관련 평가 항목을 만점으로 줄 수 없습니다.
+- 모범 답안의 조건부 설명, 상쇄 관계, 원인과 결과를 학생 답안이 절대 표현으로 바꾸면 의미 차이로 감점하세요.
+- 핵심 오개념이 있으면 관련 평가 항목 점수는 최대 배점의 70% 이하로 제한하세요.
+- 핵심 조건이 일부 누락됐지만 방향이 맞으면 관련 평가 항목 점수는 최대 배점의 80% 이하로 제한하세요.
 - reviewReasons에 점수 조정 필요성, 오개념, 누락, 불확실성을 적었다면 관련 rubricScores에서 반드시 감점해야 합니다.
 - 학생 답안이 부분적으로 맞더라도 정의가 틀렸거나 과도하게 단정적이면 개념 이해 항목에서 감점하세요.
+- 한 평가 항목에서 감점이 있으면 deductions에 해당 항목명과 구체적인 감점 사유를 포함하세요.
 - 피드백, 채점 사유, 학습 포인트, 재검토 사유는 모두 한국어로 작성하세요.
 ```
 
@@ -127,7 +132,7 @@ GradingService
 
 ## JSON 응답 Schema
 
-Gemini Provider는 `generationConfig.responseMimeType=application/json`과 `responseSchema`를 사용해 다음 구조의 JSON 응답을 요청합니다. 저장 전에는 이 schema와 별도로 백엔드 검증을 다시 수행합니다.
+Gemini Provider는 `generationConfig.responseMimeType=application/json`, `temperature=0.0`, `responseSchema`를 사용해 다음 구조의 JSON 응답을 요청합니다. 저장 전에는 이 schema와 별도로 백엔드 검증을 다시 수행합니다.
 
 ```json
 {
@@ -239,4 +244,4 @@ LLM 응답 schema를 사용하더라도 최종 저장 전에는 백엔드가 자
 
 채점 결과는 모델, 프롬프트, JSON Schema 변화에 영향을 받습니다. 따라서 결과를 해석하려면 채점 당시 사용한 프롬프트 버전과 모델명을 함께 저장해야 합니다.
 
-현재는 별도 테이블 없이 Provider별 문자열인 `gemini-grading-v1`, `mock-v1`을 `promptVersionName`에 저장합니다.
+현재는 별도 테이블 없이 Provider별 문자열인 `gemini-grading-v2`, `mock-v1`을 `promptVersionName`에 저장합니다.

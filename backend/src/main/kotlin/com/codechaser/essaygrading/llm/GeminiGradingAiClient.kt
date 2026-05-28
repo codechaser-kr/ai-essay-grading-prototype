@@ -168,6 +168,7 @@ class GeminiGradingAiClient(
             generationConfig =
                 GeminiGenerationConfig(
                     responseMimeType = "application/json",
+                    temperature = 0.0,
                     responseSchema = gradingResponseSchema,
                 ),
         )
@@ -193,9 +194,14 @@ class GeminiGradingAiClient(
             "- deductions에는 제공된 평가 항목명만 사용해야 합니다.",
             "- confidence는 HIGH, MEDIUM, LOW 중 하나여야 합니다.",
             "- confidence가 LOW이면 reviewRequired는 반드시 true여야 합니다.",
+            "- 채점 전에 모범 답안의 핵심 조건과 학생 답안의 핵심 주장을 비교한 뒤 점수를 정하세요.",
             "- 학생 답안에 오개념, 핵심 개념 누락, 모범 답안과의 의미 차이가 있으면 관련 평가 항목을 만점으로 줄 수 없습니다.",
+            "- 모범 답안의 조건부 설명, 상쇄 관계, 원인과 결과를 학생 답안이 절대 표현으로 바꾸면 의미 차이로 감점하세요.",
+            "- 핵심 오개념이 있으면 관련 평가 항목 점수는 최대 배점의 70% 이하로 제한하세요.",
+            "- 핵심 조건이 일부 누락됐지만 방향이 맞으면 관련 평가 항목 점수는 최대 배점의 80% 이하로 제한하세요.",
             "- reviewReasons에 점수 조정 필요성, 오개념, 누락, 불확실성을 적었다면 관련 rubricScores에서 반드시 감점해야 합니다.",
             "- 학생 답안이 부분적으로 맞더라도 정의가 틀렸거나 과도하게 단정적이면 개념 이해 항목에서 감점하세요.",
+            "- 한 평가 항목에서 감점이 있으면 deductions에 해당 항목명과 구체적인 감점 사유를 포함하세요.",
             "- 피드백, 채점 사유, 학습 포인트, 재검토 사유는 모두 한국어로 작성하세요.",
             "",
             "문제 제목:",
@@ -246,6 +252,7 @@ class GeminiGradingAiClient(
 
     private data class GeminiGenerationConfig(
         val responseMimeType: String,
+        val temperature: Double,
         val responseSchema: Map<String, Any>,
     )
 
@@ -278,7 +285,7 @@ class GeminiGradingAiClient(
     )
 
     companion object {
-        private const val PROMPT_VERSION_NAME = "gemini-grading-v1"
+        private const val PROMPT_VERSION_NAME = "gemini-grading-v2"
 
         private fun normalizeRubricName(name: String): String = name.trim()
 

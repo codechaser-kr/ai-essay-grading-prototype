@@ -42,7 +42,9 @@ class GeminiGradingAiClientTest {
             )
         requestExpectation.andExpect(method(HttpMethod.POST))
         requestExpectation.andExpect(header("x-goog-api-key", "test-gemini-key"))
-        requestExpectation.andExpect(content().json("""{"generationConfig":{"responseMimeType":"application/json"}}"""))
+        requestExpectation.andExpect(
+            content().json("""{"generationConfig":{"responseMimeType":"application/json","temperature":0.0}}"""),
+        )
         requestExpectation.andExpect(
             jsonPath("$.contents[0].parts[0].text")
                 .value(containsString("한국어 서술형 답안")),
@@ -55,6 +57,14 @@ class GeminiGradingAiClientTest {
             jsonPath("$.contents[0].parts[0].text")
                 .value(containsString("관련 rubricScores에서 반드시 감점")),
         )
+        requestExpectation.andExpect(
+            jsonPath("$.contents[0].parts[0].text")
+                .value(containsString("핵심 오개념이 있으면 관련 평가 항목 점수는 최대 배점의 70% 이하")),
+        )
+        requestExpectation.andExpect(
+            jsonPath("$.contents[0].parts[0].text")
+                .value(containsString("조건부 설명, 상쇄 관계, 원인과 결과")),
+        )
         requestExpectation.andRespond(withSuccess(geminiResponse(), MediaType.APPLICATION_JSON))
 
         val response = client.grade(sampleRequest())
@@ -62,7 +72,7 @@ class GeminiGradingAiClientTest {
         assertEquals(82, response.totalScore)
         assertEquals(100, response.maxScore)
         assertEquals("gemini-2.5-flash", response.modelName)
-        assertEquals("gemini-grading-v1", response.promptVersionName)
+        assertEquals("gemini-grading-v2", response.promptVersionName)
         assertEquals(GradingConfidence.MEDIUM, response.confidence)
         assertFalse(response.reviewRequired)
         assertEquals(2, response.rubricScores.size)
